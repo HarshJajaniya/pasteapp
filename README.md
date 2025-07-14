@@ -91,7 +91,10 @@ vite.config.js          # Vite config
 
 ## 📸 Screenshots
 
-> *Add screenshots here showing paste creation, view mode, and share features.*
+![Create Paste View](https://github.com/HarshJajaniya/pasteapp/blob/main/1.png)
+![Create Paste View](https://github.com/HarshJajaniya/pasteapp/blob/main/2.png)
+
+
 
 ---
 
