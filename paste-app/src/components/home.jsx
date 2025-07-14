@@ -60,7 +60,7 @@ const Home = () => {
       </div>
 
       <textarea
-        className="mt-4 w-[70%] mx-35 p-2 min-w-[500px] text-black bg-white border-1 rounded-md placeholder-gray-600"
+        className="mt-4 w-[70%] mx-33 p-2 min-w-[500px] text-black bg-white border-1 rounded-md placeholder-gray-600"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="Enter your content"
