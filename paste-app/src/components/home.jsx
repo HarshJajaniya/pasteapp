@@ -1,46 +1,44 @@
-import React, { useEffect, useState } from "react";
+import { createPaste, updatePaste, fetchPasteById } from "../api";
 import { useSearchParams } from "react-router-dom";
-import { addtopastes, updatetopaste } from "../redux/pasteSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
 const Home = () => {
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const pasteId = searchParams.get("pasteId");
-  const dispatch = useDispatch();
-  const allpaste = useSelector((state) => state.paste.pastes);
 
   useEffect(() => {
     if (pasteId) {
-      const paste = allpaste.find((p) => p._id === pasteId);
-      setTitle(paste.title);
-      setValue(paste.content);
+      fetchPasteById(pasteId)
+        .then((res) => {
+          setTitle(res.data.title);
+          setValue(res.data.content);
+        })
+        .catch(() => console.log("Paste not found"));
     }
   }, [pasteId]);
 
-  function createpaste() {
+  const handleSubmit = async () => {
     const paste = {
-      title: title,
+      title,
       content: value,
-      _id: pasteId || Date.now().toString(36),
       createdat: new Date().toISOString(),
     };
 
-    if (pasteId) {
-      // update
-      dispatch(updatetopaste(paste));
-    } else {
-      // create
-      dispatch(addtopastes(paste));
+    try {
+      if (pasteId) {
+        await updatePaste(pasteId, paste);
+      } else {
+        await createPaste(paste);
+      }
+      setTitle("");
+      setValue("");
+      setSearchParams({});
+    } catch (err) {
+      console.error("Error saving paste", err);
     }
-
-    // clear fields after creation or update
-    setTitle("");
-    setValue("");
-    setSearchParams({});
-  }
-
+  };
   return (
     <div className="flex w-full flex-col items-start p-4">
       <div className="w-full flex justify-center mt-10">
@@ -52,7 +50,7 @@ const Home = () => {
           onChange={(e) => setTitle(e.target.value)}
         />
         <button
-          onClick={createpaste}
+          onClick={handleSubmit}
           className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-950 hover:border-1 active:bg-black"
         >
           {pasteId ? "Update Paste" : "Create My Paste"}

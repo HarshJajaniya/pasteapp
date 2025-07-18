@@ -1,23 +1,19 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { fetchPasteById } from "../api";
 
 const Viewpaste = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const allpaste = useSelector((state) => state.paste.pastes);
+  const [paste, setPaste] = useState(null);
 
-  const paste = allpaste.find((p) => p._id === id);
+  useEffect(() => {
+    fetchPasteById(id).then((res) => setPaste(res.data));
+  }, [id]);
 
-  if (!paste) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-red-500 text-lg">Paste not found!</p>
-      </div>
-    );
-  }
+  if (!paste) return <p>Paste not found</p>;
 
   return (
+    // same UI with paste.title and paste.content
     <div className="flex w-full flex-col items-start p-4">
       <button
         onClick={() => navigate(-1)}

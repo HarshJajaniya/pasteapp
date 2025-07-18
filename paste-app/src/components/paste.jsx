@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { removefrompaste, resetallpaste } from "../redux/pasteSlice";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import ShareIcon from "@mui/icons-material/Share";
@@ -9,18 +8,37 @@ import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import DateRangeIcon from "@mui/icons-material/DateRange";
+import axios from "axios";
 
 const Paste = () => {
-  const pastes = useSelector((state) => state.paste.pastes);
   const navigate = useNavigate();
-  const [searchTerm, setsearchTerm] = useState("");
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // if you still use Redux for local handling
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pastes, setPastes] = useState([]);
 
-  function handledelete(pasteId) {
-    dispatch(removefrompaste(pasteId));
-  }
+  // 👉 Fetch data from backend
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/pastes") // adjust this if needed
+      .then((res) => setPastes(res.data))
+      .catch((err) => {
+        toast.error("Failed to fetch pastes");
+        console.error(err);
+      });
+  }, []);
 
-  function handleShare(paste) {
+  const handleDelete = async (pasteId) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/pastes/${pasteId}`);
+      toast.success("Deleted successfully");
+      setPastes((prev) => prev.filter((p) => p._id !== pasteId));
+    } catch (err) {
+      toast.error("Delete failed");
+      console.error(err);
+    }
+  };
+
+  const handleShare = (paste) => {
     const link = `${window.location.origin}/paste/${paste._id}`;
 
     if (navigator.share) {
@@ -34,11 +52,21 @@ const Paste = () => {
         .catch(() => toast.error("Share cancelled or failed"));
     } else {
       navigator.clipboard.writeText(link);
-      toast.success("Link copied to clipboard (share not supported)");
+      toast.success("Link copied to clipboard");
     }
-  }
+  };
 
-  const filterdata = pastes.filter((paste) =>
+  const handleResetAll = async () => {
+    try {
+      await axios.delete("http://localhost:5000/api/pastes");
+      setPastes([]);
+      toast.success("All pastes deleted");
+    } catch (err) {
+      toast.error("Failed to reset");
+    }
+  };
+
+  const filtered = pastes.filter((paste) =>
     paste.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -50,10 +78,10 @@ const Paste = () => {
           placeholder="search here"
           type="search"
           value={searchTerm}
-          onChange={(e) => setsearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
         <button
-          onClick={() => dispatch(resetallpaste())}
+          onClick={handleResetAll}
           className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-red-500 active:bg-black"
         >
           Delete All
@@ -61,8 +89,8 @@ const Paste = () => {
       </div>
 
       <div className="flex flex-col items-center gap-5 w-full">
-        {filterdata.length > 0 &&
-          filterdata.map((paste) => {
+        {filtered.length > 0 &&
+          filtered.map((paste) => {
             const formatted = new Date(paste.createdat).toLocaleString(
               "en-IN",
               {
@@ -72,14 +100,11 @@ const Paste = () => {
             );
 
             return (
-              <div
-                className="border w-[70%] p-4 rounded-[8px]"
-                key={paste?._id}
-              >
+              <div className="border w-[70%] p-4 rounded-[8px]" key={paste._id}>
                 <div className="flex justify-between items-start w-full px-4">
                   <div className="flex flex-col gap-4">
                     <div className="font-semibold text-[18px] text-blue-600">
-                      <span className="text-[16px] font-semibold text-black ">
+                      <span className="text-[16px] font-semibold text-black">
                         Title:
                       </span>{" "}
                       {paste.title}
@@ -89,31 +114,31 @@ const Paste = () => {
                       {paste.content}
                     </div>
 
-                    <div className=" flex items-end text-[14px] text-blue-900">
+                    <div className="flex items-end text-[14px] text-blue-900">
                       <DateRangeIcon /> {formatted}
                     </div>
                   </div>
 
-                  <div className="flex flex-row gap-4 ">
-                    <button className="hover:text-white active:accent-purple-700 border-1 rounded-[4px] p-1 hover:bg-blue-500">
+                  <div className="flex flex-row gap-4">
+                    <button className="hover:text-white border-1 rounded-[4px] p-1 hover:bg-blue-500">
                       <a href={`/?pasteId=${paste._id}`}>
                         <EditIcon />
                       </a>
                     </button>
                     <button
-                      className="hover:text-white active:accent-purple-700 border-1 rounded-[4px] p-1 hover:bg-blue-500"
-                      onClick={() => handledelete(paste._id)}
+                      className="hover:text-white border-1 rounded-[4px] p-1 hover:bg-blue-500"
+                      onClick={() => handleDelete(paste._id)}
                     >
                       <DeleteOutlineIcon />
                     </button>
                     <button
                       onClick={() => navigate(`/paste/${paste._id}`)}
-                      className="flex items-center gap-2 hover:text-white active:accent-purple-700 border-1 rounded-[4px] p-1 hover:bg-blue-500"
+                      className="flex items-center gap-2 hover:text-white border-1 rounded-[4px] p-1 hover:bg-blue-500"
                     >
                       <RemoveRedEyeIcon />
                     </button>
                     <button
-                      className="hover:text-white active:accent-purple-700 border-1 rounded-[4px] p-1 hover:bg-blue-500"
+                      className="hover:text-white border-1 rounded-[4px] p-1 hover:bg-blue-500"
                       onClick={() => {
                         navigator.clipboard.writeText(paste.content);
                         toast.success("Copied to clipboard");
@@ -122,7 +147,7 @@ const Paste = () => {
                       <ContentCopyIcon />
                     </button>
                     <button
-                      className="hover:text-white active:accent-purple-700 border-1 rounded-[4px] p-1 hover:bg-blue-500"
+                      className="hover:text-white border-1 rounded-[4px] p-1 hover:bg-blue-500"
                       onClick={() => handleShare(paste)}
                     >
                       <ShareIcon />
