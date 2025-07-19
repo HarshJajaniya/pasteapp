@@ -8,8 +8,21 @@ const pasteRoutes = require("./routes/PasteRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ✅ CORS Configuration
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? ["https://pasteapp-k1wd.vercel.app"]
+    : ["http://localhost:5173"];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // Routes
@@ -23,6 +36,8 @@ mongoose
   })
   .then(() => {
     console.log("✅ MongoDB connected");
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    app.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT} (${process.env.NODE_ENV})`)
+    );
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
