@@ -11,7 +11,7 @@ const PORT = "https://pasteapp-1.onrender.com/api/pastes";
 // ✅ Enable CORS for frontend (localhost:5173)
 app.use(
   cors({
-    origin: "https://pasteapp-x5l6.vercel.app/",
+    origin: "https://pasteapp-x5l6.vercel.app",
     credentials: true,
   })
 );
