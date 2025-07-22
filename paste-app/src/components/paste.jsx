@@ -20,7 +20,7 @@ const Paste = () => {
 
   useEffect(() => {
     axios
-      .get(`https://pasteapp-3.onrender.com/api/pastes`)
+      .get(`https://pasteapp-1.onrender.com/api/pastes`)
       .then((res) => setPastes(res.data))
       .catch((err) => {
         toast.error("Failed to fetch pastes");
@@ -31,7 +31,7 @@ const Paste = () => {
   const handleDelete = async (pasteId) => {
     try {
       await axios.delete(
-        `https://pasteapp-3.onrender.com/api/pastes/${pasteId}`
+        `https://pasteapp-1.onrender.com/api/pastes/${pasteId}`
       );
       toast.success("Deleted successfully");
       setPastes((prev) => prev.filter((p) => p._id !== pasteId));
@@ -60,7 +60,7 @@ const Paste = () => {
 
   const handleResetAll = async () => {
     try {
-      await axios.delete(`https://pasteapp-3.onrender.com/api/pastes`);
+      await axios.delete(`https://pasteapp-1.onrender.com/api/pastes`);
       setPastes([]);
       toast.success("All pastes deleted");
     } catch (err) {
