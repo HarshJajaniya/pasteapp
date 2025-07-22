@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5001/api/pastes"; // Replace with deployed URL later
+const BASE_URL = "https://pasteapp-2.onrender.com"; // Replace with deployed URL later
 
 export const fetchAllPastes = () => axios.get(BASE_URL);
 export const fetchPasteById = (id) => axios.get(`${BASE_URL}/${id}`);
