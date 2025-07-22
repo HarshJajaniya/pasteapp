@@ -6,7 +6,7 @@ require("dotenv").config();
 const pasteRoutes = require("./routes/PasteRoutes");
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const PORT = "https://pasteapp-1.onrender.com/api/pastes";
 
 // ✅ Enable CORS for frontend (localhost:5173)
 app.use(
@@ -36,7 +36,7 @@ mongoose
   .then(() => {
     console.log("✅ MongoDB connected");
     app.listen(PORT, () =>
-      console.log(`🚀 Server running on http://localhost:${PORT}`)
+      console.log(`🚀 Server running on https://pasteapp-1.onrender.com`)
     );
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));

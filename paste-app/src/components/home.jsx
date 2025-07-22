@@ -1,12 +1,15 @@
 import { createPaste, updatePaste, fetchPasteById } from "../api";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 
 const Home = () => {
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
   const pasteId = searchParams.get("pasteId");
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (pasteId) {
@@ -29,8 +32,10 @@ const Home = () => {
     try {
       if (pasteId) {
         await updatePaste(pasteId, paste);
+        toast.success("Updated successfully");
       } else {
         await createPaste(paste);
+        toast.success("Created successfully");
       }
       setTitle("");
       setValue("");
