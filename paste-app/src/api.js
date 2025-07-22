@@ -1,4 +1,3 @@
-// client/src/api.js
 import axios from "axios";
 
 const BASE_URL = "http://localhost:5001/api/pastes"; // Replace with deployed URL later
