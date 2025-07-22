@@ -9,22 +9,9 @@ const app = express();
 const PORT = "https://pasteapp-1.onrender.com/api/pastes";
 
 // ✅ Enable CORS for frontend (localhost:5173)
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://pasteapp-x5l6.vercel.app",
-];
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: "https://pasteapp-x5l6.vercel.app/",
     credentials: true,
   })
 );
