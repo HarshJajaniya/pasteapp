@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://pasteapp-1.onrender.com/api/pastes";
+const BASE_URL = "https://pasteapp-3.onrender.com/api/pastes";
 
 // GET all pastes
 export const fetchAllPastes = () => axios.get(BASE_URL);
