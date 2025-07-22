@@ -10,16 +10,17 @@ import EditIcon from "@mui/icons-material/Edit";
 import DateRangeIcon from "@mui/icons-material/DateRange";
 import axios from "axios";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Paste = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // if you still use Redux for local handling
+  const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [pastes, setPastes] = useState([]);
 
-  // 👉 Fetch data from backend
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/pastes") // adjust this if needed
+      .get(`http://localhost:5001/api/pastes`)
       .then((res) => setPastes(res.data))
       .catch((err) => {
         toast.error("Failed to fetch pastes");
@@ -29,7 +30,7 @@ const Paste = () => {
 
   const handleDelete = async (pasteId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/pastes/${pasteId}`);
+      await axios.delete(`http://localhost:5001/api/pastes/${pasteId}`);
       toast.success("Deleted successfully");
       setPastes((prev) => prev.filter((p) => p._id !== pasteId));
     } catch (err) {
@@ -40,7 +41,6 @@ const Paste = () => {
 
   const handleShare = (paste) => {
     const link = `${window.location.origin}/paste/${paste._id}`;
-
     if (navigator.share) {
       navigator
         .share({
@@ -58,7 +58,7 @@ const Paste = () => {
 
   const handleResetAll = async () => {
     try {
-      await axios.delete("http://localhost:5000/api/pastes");
+      await axios.delete(`http://localhost:5001/api/pastes`);
       setPastes([]);
       toast.success("All pastes deleted");
     } catch (err) {
@@ -75,7 +75,7 @@ const Paste = () => {
       <div>
         <input
           className="p-2 rounded-[8px] bg-white border-1 m-6 min-w-[600px]"
-          placeholder="search here"
+          placeholder="Search here"
           type="search"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -91,7 +91,7 @@ const Paste = () => {
       <div className="flex flex-col items-center gap-5 w-full">
         {filtered.length > 0 &&
           filtered.map((paste) => {
-            const formatted = new Date(paste.createdat).toLocaleString(
+            const formatted = new Date(paste.createdAt).toLocaleString(
               "en-IN",
               {
                 dateStyle: "medium",

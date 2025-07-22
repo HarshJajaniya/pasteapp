@@ -2,45 +2,44 @@ import { createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 
 const initialState = {
-  pastes: localStorage.getItem("pastes")
-    ? JSON.parse(localStorage.getItem("pastes"))
-    : [],
+  pastes: [],
 };
 
 export const pasteSlice = createSlice({
   name: "pastes",
   initialState,
   reducers: {
+    // Set all pastes (use after fetching from backend)
+    setAllPastes: (state, action) => {
+      state.pastes = action.payload;
+      localStorage.setItem("pastes", JSON.stringify(state.pastes));
+    },
+
+    // Add a new paste after successful POST
     addtopastes: (state, action) => {
       const paste = action.payload;
       state.pastes.push(paste);
       localStorage.setItem("pastes", JSON.stringify(state.pastes));
-      toast("Paste Created successfully");
+      toast.success("Paste created successfully");
     },
+
+    // Update paste after successful PUT
     updatetopaste: (state, action) => {
       const paste = action.payload;
       const index = state.pastes.findIndex((item) => item._id === paste._id);
       if (index >= 0) {
-        // ✅ Update the paste in the array
         state.pastes[index] = paste;
-
-        // ✅ Save updated array to localStorage
         localStorage.setItem("pastes", JSON.stringify(state.pastes));
-
-        // ✅ Show success message
         toast.success("Paste updated successfully");
       } else {
         toast.error("Paste not found for update");
       }
     },
 
-    resetallpaste: (state, action) => {
-      state.pastes = [];
-      localStorage.removeItem("pastes");
-      toast.success("Paste clear successfully");
-    },
+    // Remove paste after DELETE
     removefrompaste: (state, action) => {
-      const index = state.pastes.findIndex((p) => p._id === action.payload);
+      const id = action.payload;
+      const index = state.pastes.findIndex((p) => p._id === id);
       if (index !== -1) {
         state.pastes.splice(index, 1);
         localStorage.setItem("pastes", JSON.stringify(state.pastes));
@@ -49,11 +48,22 @@ export const pasteSlice = createSlice({
         toast.error("Paste not found");
       }
     },
+
+    // Reset all pastes (frontend only)
+    resetallpaste: (state) => {
+      state.pastes = [];
+      localStorage.removeItem("pastes");
+      toast.success("All pastes cleared");
+    },
   },
 });
 
-// Action creators are generated for each case reducer function
-export const { addtopastes, updatetopaste, resetallpaste, removefrompaste } =
-  pasteSlice.actions;
+export const {
+  setAllPastes,
+  addtopastes,
+  updatetopaste,
+  removefrompaste,
+  resetallpaste,
+} = pasteSlice.actions;
 
 export default pasteSlice.reducer;

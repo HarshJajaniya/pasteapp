@@ -6,29 +6,28 @@ require("dotenv").config();
 const pasteRoutes = require("./routes/PasteRoutes");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
-// ✅ CORS Configuration
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? ["https://pasteapp-k1wd.vercel.app"]
-    : ["http://localhost:5173"];
-
+// ✅ Enable CORS for frontend (localhost:5173)
 app.use(
   cors({
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
 
-// Middleware
+// ✅ Body parser
 app.use(express.json());
 
-// Routes
-app.use("/api/pastes", pasteRoutes); // Example: GET /api/pastes, POST /api/pastes
+// ✅ Routes
+app.use("/api/pastes", pasteRoutes);
 
-// MongoDB Connection + Server Start
+// ✅ Health check route (optional but useful)
+app.get("/", (req, res) => {
+  res.send("🚀 Paste API is running");
+});
+
+// ✅ MongoDB Connection
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
@@ -37,7 +36,7 @@ mongoose
   .then(() => {
     console.log("✅ MongoDB connected");
     app.listen(PORT, () =>
-      console.log(`🚀 Server running on port ${PORT} (${process.env.NODE_ENV})`)
+      console.log(`🚀 Server running on http://localhost:${PORT}`)
     );
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
